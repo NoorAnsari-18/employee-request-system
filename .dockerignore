@@ -1,0 +1,9 @@
+**/bin
+**/obj
+**/node_modules
+src/EmployeeRequests.Api/wwwroot
+.git
+.claude
+docs
+tests
+*.md

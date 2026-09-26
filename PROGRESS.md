@@ -2,7 +2,7 @@
 
 Update this file as each item is done. A new session resumes from the first unchecked item.
 
-**Current status:** Planning complete, incl. omni-channel (O1–O5), data flow (F1–F6) and platform choice (G1) on 2026-09-26. Next: **M1 Setup**.
+**Current status:** M2 core done and verified live against HubSpot on 2026-09-26 (submit, track, board, transitions incl. 409/400 guards, contact association, escalation run is idempotent). Security:ApiKey generated and stored in user-secrets. Test tickets REQ-IT-336967343854 and REQ-OPS-336961159887 exist in HubSpot. Next: decide AI fallback (needs Anthropic API key) or go to M3.
 
 ## M1 — Setup (cap 2h)
 - [x] Create HubSpot free account
@@ -13,18 +13,18 @@ Update this file as each item is done. A new session resumes from the first unch
 - [x] HubSpot: ticket pipeline "Employee Requests" with stages Open / Active / Finalized (created via connector; old default "Support Pipeline" id 0 left untouched, unused)
 - [x] HubSpot: create custom ticket properties (verified via connector 2026-09-26; enum values are lowercase: hr/it/payroll/operations/other, portal/email/whatsapp/intercom, rules/ai/fallback)
 - [x] HubSpot: priority URGENT exists (LOW/MEDIUM/HIGH/URGENT)
-- [ ] HubSpot: Private App with scopes `tickets`, `crm.objects.contacts.read`, `crm.objects.contacts.write`, `crm.objects.owners.read`, `crm.schemas.tickets.read` (verify) → token saved locally in user-secrets (never commit)
+- [x] HubSpot: Private App with scopes `tickets`, `crm.objects.contacts.read`, `crm.objects.contacts.write`, `crm.objects.owners.read`, `crm.schemas.tickets.read` (verify) → token saved locally in user-secrets (never commit)
 - [x] Get your HubSpot owner ID
-- [ ] Verify token with one test API call
+- [x] Verify token with one test API call (pipeline, ticket search, contacts, owners all 200)
 - [x] Project skeleton: .NET 10 API (serves React build + /health) + React/Vite/TS (builds to wwwroot, dev proxy) + xUnit; git init; user-secrets init
 - [ ] Create public GitHub repo and push
 
 ## M2 — Backend (cap 3.5h)
-- [ ] rules.json + Classifier + unit tests
-- [ ] Routing/SLA config (DEMO_MODE)
-- [ ] HubSpot client: upsert contact, create ticket with association, update, search
-- [ ] POST /api/requests, GET /api/requests/{id}, GET /api/tickets, PATCH status, POST escalations/run, GET /health
-- [ ] X-Api-Key check (escalations + trusted source_channel); retry 2× on 429/5xx
+- [x] rules.json + Classifier + unit tests (23 passing: classifier, priority, lifecycle, SLA)
+- [x] Routing/SLA config (Sla:DemoMode=true in appsettings)
+- [x] HubSpot client: upsert contact, create ticket with association (typeId 16 verified), update, get, search
+- [x] POST /api/requests, GET /api/requests/{id}, GET /api/tickets, PATCH status, POST escalations/run, GET /health
+- [x] X-Api-Key check (escalations + trusted source_channel); retry 2× on 429/5xx
 - [ ] (stretch) AI fallback behind AI_TRIAGE_ENABLED
 
 ## M3 — UI + deploy (cap 3h)

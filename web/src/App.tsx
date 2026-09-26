@@ -1,122 +1,68 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
+import SubmitPage from './pages/SubmitPage'
+import BoardPage from './pages/BoardPage'
+import TrackPage from './pages/TrackPage'
 
-function App() {
-  const [count, setCount] = useState(0)
+// Three pages don't need a router library: map the path to a page and use pushState for navigation.
+const routes: Record<string, () => ReactNode> = {
+  '/': () => <SubmitPage />,
+  '/board': () => <BoardPage />,
+  '/track': () => <TrackPage />,
+}
 
+export function navigate(to: string) {
+  window.history.pushState({}, '', to)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+}
+
+export function Link({ to, children, className }: { to: string; children: ReactNode; className?: string }) {
+  const onClick = (e: MouseEvent) => {
+    if (e.metaKey || e.ctrlKey) return
+    e.preventDefault()
+    navigate(to)
+  }
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <a href={to} onClick={onClick} className={className}>
+      {children}
+    </a>
   )
 }
 
-export default App
+export default function App() {
+  const [path, setPath] = useState(window.location.pathname)
+
+  useEffect(() => {
+    const onPop = () => setPath(window.location.pathname)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const page = routes[path] ?? routes['/']
+  const nav = [
+    { to: '/', label: 'Submit request' },
+    { to: '/track', label: 'Track request' },
+    { to: '/board', label: 'Agent board' },
+  ]
+
+  return (
+    <div className="shell">
+      <header className="topbar">
+        <Link to="/" className="brand">
+          <span className="brand-mark">ER</span>
+          Employee Requests
+        </Link>
+        <nav>
+          {nav.map((n) => (
+            <Link key={n.to} to={n.to} className={path === n.to ? 'active' : ''}>
+              {n.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
+      <main>{page()}</main>
+      <footer className="footer">
+        Proof of concept · Web app (ASP.NET Core + React) → HubSpot CRM tickets → Zapier automations
+      </footer>
+    </div>
+  )
+}

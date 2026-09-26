@@ -2,7 +2,7 @@
 
 Update this file as each item is done. A new session resumes from the first unchecked item.
 
-**Current status:** M2 core done and verified live against HubSpot on 2026-09-26 (submit, track, board, transitions incl. 409/400 guards, contact association, escalation run is idempotent). Security:ApiKey generated and stored in user-secrets. Test tickets REQ-IT-336967343854 and REQ-OPS-336961159887 exist in HubSpot. Next: decide AI fallback (needs Anthropic API key) or go to M3.
+**Current status:** M1–M2 done; M3 UI built and verified locally (submit, track, board read live from HubSpot). Next: deploy to Render, cron-job.org ping, seed demo data, clean up [TEST] tickets.
 
 ## M1 — Setup (cap 2h)
 - [x] Create HubSpot free account
@@ -25,15 +25,16 @@ Update this file as each item is done. A new session resumes from the first unch
 - [x] HubSpot client: upsert contact, create ticket with association (typeId 16 verified), update, get, search
 - [x] POST /api/requests, GET /api/requests/{id}, GET /api/tickets, PATCH status, POST escalations/run, GET /health
 - [x] X-Api-Key check (escalations + trusted source_channel); retry 2× on 429/5xx
-- [ ] (stretch) AI fallback behind AI_TRIAGE_ENABLED
+- [ ] ~~(stretch) AI fallback~~ skipped by decision 2026-09-26 → describe in summary as high-ROI next step
 
 ## M3 — UI + deploy (cap 3h)
-- [ ] Submit form + confirmation with request ID
-- [ ] 3-column board with Start / Resolve (note)
-- [ ] Track page
-- [ ] Dockerfile, deploy to Render, env vars
+- [x] Submit form + confirmation with request ID
+- [x] 3-column board with Start / Resolve (note), 30s auto-refresh
+- [x] Track page (/track?id=…)
+- [x] Dockerfile + .dockerignore + README (Release publish verified locally; Docker not installed locally)
+- [ ] Deploy to Render, env vars HubSpot__Token + Security__ApiKey
 - [ ] cron-job.org ping /health
-- [ ] Seed ~8 demo tickets
+- [ ] Seed ~8 demo tickets (scripts/seed.ps1 ready; run against Render URL, then remove [TEST] tickets)
 
 ## M4 — Zapier (cap 2h)
 - [ ] Start Zapier Pro trial; connect HubSpot + demo Gmail

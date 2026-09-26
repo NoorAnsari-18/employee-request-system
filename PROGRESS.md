@@ -2,7 +2,7 @@
 
 Update this file as each item is done. A new session resumes from the first unchecked item.
 
-**Current status:** Deployed to Render. rules.json extended (IT: cpu/computer/slow…, Payroll: form-16/tds/credited…, boosters: salary not credited, payslip missing); 26 tests pass. Next: fix Render Security__ApiKey, push rules update, clean up test tickets, seed, cron-job.org, then M4.
+**Current status:** Configurable routing built and verified locally (needs push). Next: push, then Z1 in Zapier with To = Assigned team email.
 
 ## M1 — Setup (cap 2h)
 - [x] Create HubSpot free account
@@ -33,12 +33,19 @@ Update this file as each item is done. A new session resumes from the first unch
 - [x] Track page (/track?id=…)
 - [x] Dockerfile + .dockerignore + README (Release publish verified locally; Docker not installed locally)
 - [x] Deploy to Render: https://employee-request-system.onrender.com (health, pages, HubSpot read OK)
-- [ ] Fix Render Security__ApiKey (live escalation returned 401 with local key on 2026-09-26)
+- [x] Render Security__ApiKey fixed; live escalation run 200 (escalated 5 overdue tickets). Key copy in git-ignored api-key.local.txt
 - [ ] cron-job.org ping /health
 - [ ] Seed ~8 demo tickets (scripts/seed.ps1 ready; run against Render URL, then remove [TEST] tickets)
 
+## Routing & assignment (added 2026-09-26)
+- [x] HubSpot properties assigned_team, assigned_team_email (via connector)
+- [x] routing.json + env overrides; API stores team on ticket, board/track/escalations resolve live; GET /api/teams
+- [x] Board team filter + ?team= deep link; "Assigned to" on board, confirmation and track pages
+- [x] 34 tests pass (8 new routing tests); verified locally: payroll request → Payroll Team / er-payroll-team@mailinator.com in HubSpot
+- [ ] Commit + push → Render redeploy
+
 ## M4 — Zapier (cap 2h)
-- [ ] Start Zapier Pro trial; connect HubSpot + demo Gmail
+- [ ] Start Zapier Pro trial; connect HubSpot. Email: "Email by Zapier" for now (B7 revised 2026-09-26, personal inbox kept out); demo Gmail optional later. Demo recipients: er-demo-owner@mailinator.com, er-demo-manager@mailinator.com; demo employees use @mailinator.com
 - [ ] Z1 new ticket notifications
 - [ ] Z2 stage-change notification (or webhook fallback)
 - [ ] Z3 scheduled escalation

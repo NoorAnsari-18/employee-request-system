@@ -489,3 +489,6 @@ node_modules/
 # Recruiter-provided assignment brief: keep local, not in the public repo
 docs/assignment.pdf
 docs/assignment.md
+
+# Local copy of the Zapier API key for pasting into Render/Zapier
+api-key.local.txt

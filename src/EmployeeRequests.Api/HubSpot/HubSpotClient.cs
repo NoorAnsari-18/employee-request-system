@@ -39,6 +39,7 @@ public sealed record Ticket(
     string? SourceChannel,
     string? ResolutionNote,
     string? OwnerId,
+    string? AssignedTeam,
     DateTimeOffset CreatedAt);
 
 /// <summary>Thin typed wrapper over the HubSpot CRM v3 REST API. The only component that writes to HubSpot.</summary>
@@ -52,6 +53,7 @@ public sealed class HubSpotClient(HttpClient http, IOptions<HubSpotOptions> opti
         "subject", "content", "hs_pipeline", "hs_pipeline_stage", "hs_ticket_priority", "hubspot_owner_id",
         "request_id", "department", "employee_name", "employee_email", "classified_by",
         "classification_confidence", "sla_due_at", "escalated", "resolution_note", "source_channel", "createdate",
+        "assigned_team", "assigned_team_email",
     ];
 
     private readonly HubSpotOptions _opt = options.Value;
@@ -189,6 +191,7 @@ public sealed class HubSpotClient(HttpClient http, IOptions<HubSpotOptions> opti
             SourceChannel: S("source_channel"),
             ResolutionNote: S("resolution_note"),
             OwnerId: S("hubspot_owner_id"),
+            AssignedTeam: S("assigned_team"),
             CreatedAt: ParseDate(S("createdate")) ?? DateTimeOffset.MinValue);
     }
 

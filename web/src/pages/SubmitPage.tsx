@@ -41,8 +41,10 @@ export default function SubmitPage() {
         <h1 className="request-id">{result.requestId}</h1>
         <p className="muted">Keep this ID to check progress. A confirmation email is on its way.</p>
         <dl className="facts">
-          <dt>Routed to</dt>
+          <dt>Category</dt>
           <dd>{departmentLabel[result.department] ?? result.department}</dd>
+          <dt>Assigned to</dt>
+          <dd>{result.assignedTeam}</dd>
           <dt>Priority</dt>
           <dd>
             <span className={`badge prio-${result.priority.toLowerCase()}`}>{result.priority}</span>

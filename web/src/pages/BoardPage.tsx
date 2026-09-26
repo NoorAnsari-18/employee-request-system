@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api, ApiError, departmentLabel, formatDate, slaLabel, type BoardTicket, type Status } from '../api'
+import { api, ApiError, departmentLabel, formatDate, slaLabel, type BoardTicket, type Status, type Team } from '../api'
 
 const columns: { status: Status; title: string; hint: string }[] = [
   { status: 'Open', title: 'Open', hint: 'New, not yet picked up' },
@@ -13,6 +13,18 @@ export default function BoardPage() {
   const [tickets, setTickets] = useState<BoardTicket[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
+  const [teams, setTeams] = useState<Team[]>([])
+  // ?team=payroll lets each team's notification email open straight into its own queue.
+  const [team, setTeam] = useState(() => new URLSearchParams(window.location.search).get('team') ?? 'all')
+
+  useEffect(() => {
+    api.teams().then(setTeams).catch(() => setTeams([]))
+  }, [])
+
+  const chooseTeam = (key: string) => {
+    setTeam(key)
+    window.history.replaceState({}, '', key === 'all' ? '/board' : `/board?team=${key}`)
+  }
 
   // Always read live from HubSpot, so changes made directly in HubSpot show up here too.
   const load = useCallback(async () => {
@@ -49,12 +61,25 @@ export default function BoardPage() {
           Refresh
         </button>
       </div>
+      <div className="team-filter" role="tablist" aria-label="Filter by team">
+        {[{ key: 'all', name: 'All teams' }, ...teams].map((t) => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={team === t.key}
+            className={team === t.key ? 'active' : ''}
+            onClick={() => chooseTeam(t.key)}
+          >
+            {t.name}
+          </button>
+        ))}
+      </div>
       {error && <p className="alert">{error}</p>}
       {!tickets && !error && <p className="muted">Loading tickets…</p>}
       {tickets && (
         <div className="board">
           {columns.map((col) => {
-            const items = tickets.filter((t) => t.status === col.status)
+            const items = tickets.filter((t) => t.status === col.status && (team === 'all' || t.department === team))
             return (
               <div key={col.status} className={`column col-${col.status.toLowerCase()}`}>
                 <div className="column-head">
@@ -109,6 +134,9 @@ function TicketCard({ ticket: t, onChanged }: { ticket: BoardTicket; onChanged: 
         {t.escalated && <span className="badge danger">Escalated</span>}
         {t.sourceChannel && t.sourceChannel !== 'portal' && <span className="badge">via {t.sourceChannel}</span>}
       </div>
+      <p className="ticket-meta">
+        Assigned to <strong>{t.assignedTeam}</strong>
+      </p>
       <p className="ticket-meta">
         {t.employeeName ?? 'Unknown'} · {formatDate(t.createdAt)}
       </p>

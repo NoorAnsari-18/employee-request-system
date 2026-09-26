@@ -15,6 +15,7 @@ export interface SubmitResult {
   requestId: string
   ticketId: string
   department: string
+  assignedTeam: string
   priority: Priority
   slaDueAt: string
   classifiedBy: string
@@ -26,6 +27,7 @@ export interface TrackResult {
   requestId: string
   subject: string
   department: string
+  assignedTeam: string
   priority: Priority
   status: Status
   slaDueAt: string | null
@@ -41,6 +43,11 @@ export interface BoardTicket extends TrackResult {
   classifiedBy: string | null
   confidence: number | null
   sourceChannel: string | null
+}
+
+export interface Team {
+  key: string
+  name: string
 }
 
 export class ApiError extends Error {
@@ -72,6 +79,7 @@ export const api = {
     request<SubmitResult>('/api/requests', { method: 'POST', body: JSON.stringify(payload) }),
   track: (requestId: string) => request<TrackResult>(`/api/requests/${encodeURIComponent(requestId.trim())}`),
   tickets: () => request<BoardTicket[]>('/api/tickets'),
+  teams: () => request<Team[]>('/api/teams'),
   changeStatus: (id: string, status: Status, resolutionNote?: string) =>
     request<BoardTicket>(`/api/tickets/${id}/status`, {
       method: 'PATCH',

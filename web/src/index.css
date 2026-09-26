@@ -150,3 +150,10 @@ form > .button { align-self: flex-start; }
 .steps li.done .dot { background: var(--ok); }
 .steps li.done::before, .steps li.current::before { background: var(--ok); }
 .steps li.current .dot { background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+
+.team-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.team-filter button {
+  font: inherit; font-size: 0.85rem; font-weight: 500; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+}
+.team-filter button.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }

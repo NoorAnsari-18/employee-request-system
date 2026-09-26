@@ -1,0 +1,13 @@
+{
+  "Routing": {
+    "DefaultOwnerId": "99794997",
+    "ManagerEmail": "er-demo-manager@mailinator.com",
+    "Teams": {
+      "hr":         { "Name": "HR Team",         "Email": "er-hr-team@mailinator.com",      "OwnerId": "99794997" },
+      "it":         { "Name": "IT Support",      "Email": "er-it-team@mailinator.com",      "OwnerId": "99794997" },
+      "payroll":    { "Name": "Payroll Team",    "Email": "er-payroll-team@mailinator.com", "OwnerId": "99794997" },
+      "operations": { "Name": "Operations Team", "Email": "er-ops-team@mailinator.com",     "OwnerId": "99794997" },
+      "other":      { "Name": "Triage Desk",     "Email": "er-triage@mailinator.com",       "OwnerId": "99794997" }
+    }
+  }
+}

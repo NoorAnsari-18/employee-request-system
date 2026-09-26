@@ -62,6 +62,8 @@ export default function TrackPage() {
           <dl className="facts">
             <dt>Department</dt>
             <dd>{departmentLabel[result.department] ?? result.department}</dd>
+            <dt>Assigned to</dt>
+            <dd>{result.assignedTeam}</dd>
             <dt>Priority</dt>
             <dd>
               <span className={`badge prio-${result.priority.toLowerCase()}`}>{result.priority}</span>

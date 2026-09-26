@@ -28,12 +28,13 @@ public static class RequestEndpoints
         api.MapGet("/tickets", List);
         api.MapPatch("/tickets/{id}/status", ChangeStatus);
         api.MapPost("/escalations/run", RunEscalations);
+        api.MapGet("/teams", Teams);
     }
 
     // Intake: every channel (portal form, Zapier email adapter, …) lands here.
     private static async Task<IResult> Submit(
         SubmitRequest req, HttpContext http, Classifier classifier, HubSpotClient hubspot,
-        IOptions<RoutingOptions> routing, IOptions<SlaOptions> sla, IOptions<SecurityOptions> security, TimeProvider clock,
+        IOptionsMonitor<RoutingOptions> routing, IOptions<SlaOptions> sla, IOptions<SecurityOptions> security, TimeProvider clock,
         CancellationToken ct)
     {
         var errors = Validate(req);
@@ -53,6 +54,7 @@ public static class RequestEndpoints
         var classification = classifier.Classify(subject, description);
         var priority = classifier.ResolvePriority(PriorityExtensions.ParsePriority(req.Urgency) ?? Priority.Medium, subject, description);
         var slaDue = sla.Value.DueAt(priority, clock.GetUtcNow());
+        var team = routing.CurrentValue.TeamFor(classification.Department);
 
         var contactId = await hubspot.UpsertContactAsync(name, email, ct);
         var ticketId = await hubspot.CreateTicketAsync(new()
@@ -61,7 +63,9 @@ public static class RequestEndpoints
             ["content"] = description,
             ["hs_pipeline_stage"] = hubspot.StageId(Stage.Open),
             ["hs_ticket_priority"] = priority.ToHubSpot(),
-            ["hubspot_owner_id"] = routing.Value.OwnerFor(classification.Department),
+            ["hubspot_owner_id"] = routing.CurrentValue.OwnerFor(classification.Department),
+            ["assigned_team"] = team.Name,
+            ["assigned_team_email"] = team.Email,
             ["department"] = classification.Department,
             ["employee_name"] = name,
             ["employee_email"] = email,
@@ -81,6 +85,7 @@ public static class RequestEndpoints
             requestId,
             ticketId,
             department = classification.Department,
+            assignedTeam = team.Name,
             priority = priority.ToString(),
             slaDueAt = slaDue,
             classifiedBy = classification.ClassifiedBy,
@@ -90,7 +95,7 @@ public static class RequestEndpoints
     }
 
     // Public status lookup. Shows no personal data.
-    private static async Task<IResult> Track(string requestId, HubSpotClient hubspot, CancellationToken ct)
+    private static async Task<IResult> Track(string requestId, HubSpotClient hubspot, IOptionsMonitor<RoutingOptions> routing, CancellationToken ct)
     {
         var ticketId = requestId.Split('-').LastOrDefault();
         if (ticketId is null || !ticketId.All(char.IsAsciiDigit))
@@ -102,19 +107,24 @@ public static class RequestEndpoints
 
         return Results.Ok(new
         {
-            t.RequestId, t.Subject, t.Department, Priority = t.Priority.ToString(), Status = t.Stage.ToString(),
-            t.SlaDueAt, t.Escalated, t.ResolutionNote, t.CreatedAt,
+            t.RequestId, t.Subject, t.Department, AssignedTeam = routing.CurrentValue.TeamFor(t.Department).Name,
+            Priority = t.Priority.ToString(), Status = t.Stage.ToString(), t.SlaDueAt, t.Escalated, t.ResolutionNote, t.CreatedAt,
         });
     }
 
     // Agent board data. Employee email is left out because the demo board is public.
-    private static async Task<IResult> List(HubSpotClient hubspot, CancellationToken ct)
+    private static async Task<IResult> List(HubSpotClient hubspot, IOptionsMonitor<RoutingOptions> routing, CancellationToken ct)
     {
         var tickets = await hubspot.ListTicketsAsync(ct);
-        return Results.Ok(tickets.Select(BoardView));
+        return Results.Ok(tickets.Select(t => BoardView(t, routing.CurrentValue)));
     }
 
-    private static async Task<IResult> ChangeStatus(string id, StatusChange change, HubSpotClient hubspot, CancellationToken ct)
+    // Team keys and names for the board filter.
+    private static IResult Teams(IOptionsMonitor<RoutingOptions> routing) =>
+        Results.Ok(routing.CurrentValue.Teams.Select(t => new { key = t.Key, name = t.Value.Name }));
+
+    private static async Task<IResult> ChangeStatus(
+        string id, StatusChange change, HubSpotClient hubspot, IOptionsMonitor<RoutingOptions> routing, CancellationToken ct)
     {
         if (!Enum.TryParse<Stage>(change.Status, ignoreCase: true, out var target))
             return Results.ValidationProblem(new Dictionary<string, string[]> { ["status"] = ["Status must be Active or Finalized."] });
@@ -135,12 +145,15 @@ public static class RequestEndpoints
             props["resolution_note"] = note!;
 
         var updated = await hubspot.UpdateTicketAsync(id, props, ct);
-        return Results.Ok(BoardView(updated));
+        return Results.Ok(BoardView(updated, routing.CurrentValue));
     }
 
-    // Called by the Zapier schedule. Escalates overdue tickets and returns them so Zapier can alert the manager.
+    // Called by the Zapier schedule. Escalates overdue tickets and returns them so Zapier can alert the manager,
+    // CC'ing the responsible teams. Team emails come from the *current* routing table, so if a mailbox changed
+    // after the ticket was created, the escalation still reaches the right people.
     private static async Task<IResult> RunEscalations(
-        HttpContext http, HubSpotClient hubspot, IOptions<SecurityOptions> security, TimeProvider clock, CancellationToken ct)
+        HttpContext http, HubSpotClient hubspot, IOptions<SecurityOptions> security, IOptionsMonitor<RoutingOptions> routing,
+        TimeProvider clock, CancellationToken ct)
     {
         if (!HasValidApiKey(http, security.Value))
             return Results.Unauthorized();
@@ -149,17 +162,27 @@ public static class RequestEndpoints
         foreach (var t in overdue)
             await hubspot.UpdateTicketAsync(t.Id, new() { ["hs_ticket_priority"] = Priority.Urgent.ToHubSpot(), ["escalated"] = "true" }, ct);
 
+        var routes = routing.CurrentValue;
+        var items = overdue.Select(t => (Ticket: t, Team: routes.TeamFor(t.Department))).ToList();
         return Results.Ok(new
         {
-            count = overdue.Count,
-            summary = string.Join("\n", overdue.Select(t => $"{t.RequestId} [{t.Department}] {t.Subject} (due {t.SlaDueAt:u})")),
-            escalated = overdue.Select(t => new { t.Id, t.RequestId, t.Subject, t.Department, t.SlaDueAt, t.OwnerId }),
+            count = items.Count,
+            managerEmail = routes.ManagerEmail,
+            ccEmails = string.Join(",", items.Select(i => i.Team.Email).Where(e => e.Length > 0).Distinct()),
+            summary = string.Join("\n", items.Select(i => $"{i.Ticket.RequestId} [{i.Team.Name}] {i.Ticket.Subject} (due {i.Ticket.SlaDueAt:u})")),
+            escalated = items.Select(i => new
+            {
+                i.Ticket.Id, i.Ticket.RequestId, i.Ticket.Subject, i.Ticket.Department, i.Ticket.SlaDueAt,
+                TeamName = i.Team.Name, TeamEmail = i.Team.Email,
+            }),
         });
     }
 
-    private static object BoardView(Ticket t) => new
+    // The team shown is resolved from the current routing table, so the board reflects routing changes immediately.
+    private static object BoardView(Ticket t, RoutingOptions routing) => new
     {
-        t.Id, t.RequestId, t.Subject, t.Description, t.Department, Priority = t.Priority.ToString(), Status = t.Stage.ToString(),
+        t.Id, t.RequestId, t.Subject, t.Description, t.Department, AssignedTeam = routing.TeamFor(t.Department).Name,
+        Priority = t.Priority.ToString(), Status = t.Stage.ToString(),
         t.EmployeeName, t.SlaDueAt, t.Escalated, t.ClassifiedBy, t.Confidence, t.SourceChannel, t.ResolutionNote, t.CreatedAt,
     };
 

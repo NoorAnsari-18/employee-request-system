@@ -4,6 +4,12 @@ using EmployeeRequests.Api.HubSpot;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Routing table lives in its own file. Environment variables are re-added after it so that
+// e.g. Routing__Teams__payroll__Email set on Render still overrides the file.
+builder.Configuration
+    .AddJsonFile("routing.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 builder.Services.Configure<HubSpotOptions>(builder.Configuration.GetSection("HubSpot"));
 builder.Services.Configure<RoutingOptions>(builder.Configuration.GetSection("Routing"));
 builder.Services.Configure<SlaOptions>(builder.Configuration.GetSection("Sla"));

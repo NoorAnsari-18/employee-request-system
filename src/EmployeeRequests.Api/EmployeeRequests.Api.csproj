@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Update="rules.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Update="rules.json;routing.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

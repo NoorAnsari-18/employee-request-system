@@ -24,7 +24,7 @@ Employee ─► Web app (ASP.NET Core .NET 10 + React)          ◄── Zapier
 
 1. `POST /api/requests` validates input, then the **keyword classifier** scores each department (`rules.json`). Rules decide when confidence ≥ 0.6 and score ≥ 2; otherwise the ticket goes to **Other / needs triage**.
 2. **Priority** starts at the employee's urgency; booster phrases ("salary not received", "cannot access", "security"…) raise it to High, never lower it.
-3. **Routing** picks the owner per department (`appsettings.json → Routing`); **SLA** sets `sla_due_at` from priority (4h / 24h / 72h, or 5 / 15 / 30 min in `Sla:DemoMode`).
+3. **Routing** assigns the responsible team from [`routing.json`](src/EmployeeRequests.Api/routing.json): each department maps to a team name and a **shared team mailbox** (roles, not people, so staff turnover doesn't break routing). Any entry can be changed without code via environment variables, e.g. `Routing__Teams__payroll__Email`; **SLA** sets `sla_due_at` from priority (4h / 24h / 72h, or 5 / 15 / 30 min in `Sla:DemoMode`).
 4. The employee's HubSpot **contact** is upserted by email and the **ticket** is created in the *Employee Requests* pipeline, associated with that contact.
 5. The public ID `REQ-{DEPT}-{HubSpotTicketId}` (e.g. `REQ-IT-336967343854`) is stored on the ticket.
 6. Agents move tickets **Open → Active → Finalized** on `/board`; skipping or reopening is rejected (409), and finalizing requires a resolution note.
@@ -39,6 +39,7 @@ Employee ─► Web app (ASP.NET Core .NET 10 + React)          ◄── Zapier
 | GET | `/api/tickets` | Board data |
 | PATCH | `/api/tickets/{id}/status` | `{ "status": "Active" \| "Finalized", "resolutionNote": "…" }` |
 | POST | `/api/escalations/run` | Escalate overdue tickets (requires `X-Api-Key`) |
+| GET | `/api/teams` | Team list for the board filter |
 | GET | `/health` | Keep-alive |
 
 ## Run locally

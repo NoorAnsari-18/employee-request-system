@@ -35,7 +35,7 @@ Employee ─► Portal (ASP.NET Core .NET 10 Minimal API + React/Vite in wwwroot
 | Q10 | Priority | Employee urgency; keyword boosters can raise, never lower |
 | B1 | Employee | **Upsert HubSpot Contact by email** (`/crm/v3/objects/contacts/batch/upsert`, idProperty=email) + create ticket with inline association (ticket→contact, HUBSPOT_DEFINED typeId 16 — verify). Also copy `employee_name`/`employee_email` onto ticket for Zapier |
 | B2 | Form | Name*, Email*, Subject*, Description*, Urgency (Low/Medium/High, default Medium). No department field |
-| B7 | Email sender | Gmail action from a new demo Gmail account |
+| B7 | Email sender | **Revised 2026-09-26:** "Email by Zapier" (send + robot.zapier.com intake) now; swap to a demo Gmail later if created. Demo owner/manager/employees use public @mailinator.com inboxes so reviewers can see emails |
 | B8 | Board access | Open, "Demo – agent view" banner; SSO out of scope |
 | B9 | Repo | Public GitHub, README, secrets only in Render env vars |
 | B10 | Demo data | Seed script: ~8 tickets across departments and states |
@@ -66,6 +66,17 @@ Extensibility principle for the summary: "channel-agnostic: new channels are ada
 
 Connections: (1) web app → HubSpot write, (2) web app ← HubSpot read (pull), (3) Zapier ← HubSpot (polling triggers, OAuth), (4) Zapier → web app (Webhooks, X-Api-Key), (5) web app → Zapier Catch Hook (only if needed), (6) Zapier → Gmail.
 
+### Routing & assignment (decided 2026-09-26)
+
+| # | Topic | Decision |
+|---|---|---|
+| C0 | Code vs workflow | Assignment is tool-agnostic ("algorithmic categorization"); code chosen (free tier, testable, rules.json editable). Justify in summary |
+| C1 | Where routing lives | `routing.json` (department → team name, shared mailbox, HubSpot owner; manager email). Any value overridable on Render without code, e.g. `Routing__Teams__payroll__Email` |
+| C2 | What email | Team (shared) mailboxes, not individuals → staff turnover handled by mailbox membership. Demo: `er-hr-team@`, `er-it-team@`, `er-payroll-team@`, `er-ops-team@`, `er-triage@` (all @mailinator.com) |
+| C3 | Open tickets after routing change | Ticket stores `assigned_team` + `assigned_team_email` at creation (Z1 uses it); board, track and escalations resolve the team from the **current** routing table |
+| C4 | Board | Team filter (All/HR/IT/Payroll/Ops/Triage), deep link `/board?team=<dept>` |
+| C5 | Escalations | To manager (`Routing:ManagerEmail`), CC responsible teams (`ccEmails` in `/api/escalations/run` response) |
+
 ## HubSpot ticket properties
 
 Standard: `subject`, `content`, `hs_pipeline`, `hs_pipeline_stage`, `hs_ticket_priority`, `hubspot_owner_id`.
@@ -84,6 +95,8 @@ Custom:
 | `escalated` | single checkbox (yes/no) |
 | `resolution_note` | multi-line text |
 | `source_channel` | dropdown: Portal / Email / WhatsApp / Intercom |
+| `assigned_team` | single-line text (team name at routing time) |
+| `assigned_team_email` | single-line text (team mailbox at routing time) |
 
 Priority: check if portal has URGENT; if not, escalation = HIGH + `escalated=true`.
 

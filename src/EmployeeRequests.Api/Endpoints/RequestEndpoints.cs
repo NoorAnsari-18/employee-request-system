@@ -186,8 +186,10 @@ public static class RequestEndpoints
 
     private static bool HasValidApiKey(HttpContext http, SecurityOptions security)
     {
-        if (security.ApiKey.Length == 0 || !http.Request.Headers.TryGetValue("X-Api-Key", out var provided))
+        // Trim both sides: stray whitespace from copy-pasting into Render/Zapier is the usual cause of mismatches.
+        var expected = security.ApiKey.Trim();
+        if (expected.Length == 0 || !http.Request.Headers.TryGetValue("X-Api-Key", out var provided))
             return false;
-        return CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(provided.ToString()), Encoding.UTF8.GetBytes(security.ApiKey));
+        return CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(provided.ToString().Trim()), Encoding.UTF8.GetBytes(expected));
     }
 }

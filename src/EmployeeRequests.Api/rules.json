@@ -3,25 +3,84 @@
   "minScore": 2,
   "departments": {
     "hr": {
-      "leave": 1, "vacation": 1, "holiday": 1, "sick": 1, "maternity": 2, "paternity": 2,
-      "onboarding": 1, "policy": 1, "attendance": 1, "resignation": 2
+      "leave": 1,
+      "vacation": 1,
+      "holiday": 1,
+      "sick": 1,
+      "maternity": 2,
+      "paternity": 2,
+      "onboarding": 1,
+      "policy": 1,
+      "attendance": 1,
+      "resignation": 2
     },
     "it": {
-      "laptop": 1, "password": 2, "vpn": 2, "login": 1, "log in": 1, "software": 1,
-      "printer": 1, "wifi": 1, "access": 1, "email account": 1
+      "laptop": 1,
+      "password": 2,
+      "vpn": 2,
+      "login": 1,
+      "log in": 1,
+      "software": 1,
+      "printer": 1,
+      "wifi": 1,
+      "access": 1,
+      "email account": 1,
+      "cpu": 2,
+      "computer": 1,
+      "slow": 1,
+      "internet": 1,
+      "network": 1,
+      "monitor": 1,
+      "keyboard": 1,
+      "crash": 1,
+      "install": 1,
+      "error": 1
     },
     "payroll": {
-      "salary": 2, "payslip": 2, "reimbursement": 1, "tax": 1, "deduction": 1,
-      "bonus": 1, "overtime": 1, "payment": 1
+      "salary": 2,
+      "payslip": 2,
+      "reimbursement": 1,
+      "tax": 1,
+      "deduction": 1,
+      "bonus": 1,
+      "overtime": 1,
+      "payment": 1,
+      "form 16": 2,
+      "form-16": 2,
+      "tds": 2,
+      "payroll": 2,
+      "credited": 1,
+      "provident fund": 2
     },
     "operations": {
-      "facilities": 1, "office": 1, "desk": 1, "parking": 1, "travel": 1,
-      "supplies": 1, "cleaning": 1, "booking": 1, "ac": 1
+      "facilities": 1,
+      "office": 1,
+      "desk": 1,
+      "parking": 1,
+      "travel": 1,
+      "supplies": 1,
+      "cleaning": 1,
+      "booking": 1,
+      "ac": 1
     }
   },
   "priorityBoosters": [
-    "salary not received", "not received my salary", "can't login", "cannot login", "can't log in",
-    "cannot log in", "cannot access", "can't access", "security", "breach", "system down",
-    "urgent", "asap"
+    "salary not received",
+    "not received my salary",
+    "can't login",
+    "cannot login",
+    "can't log in",
+    "cannot log in",
+    "cannot access",
+    "can't access",
+    "security",
+    "breach",
+    "system down",
+    "urgent",
+    "asap",
+    "salary not credited",
+    "not credited",
+    "payslip missing",
+    "payslip is missing"
   ]
 }

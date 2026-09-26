@@ -14,6 +14,8 @@ public class ClassifierTests
     [InlineData("Password reset", "I forgot my password for the HR system.", Departments.It)]
     [InlineData("Payslip missing", "My September payslip is not in the portal and the salary looks lower.", Departments.Payroll)]
     [InlineData("Travel reimbursement", "Need reimbursement for the client visit, receipts attached. Payment pending.", Departments.Payroll)]
+    [InlineData("my machine is consuming more CPU", "The computer is very slow since yesterday.", Departments.It)]
+    [InlineData("Form-16 to proof my employability", "Need my Form-16 for the last financial year.", Departments.Payroll)]
     [InlineData("Desk booking and parking", "Please book a desk on floor 3 and a parking spot for Friday.", Departments.Operations)]
     public void Classifies_clear_requests_by_rules(string subject, string description, string expected)
     {
@@ -66,6 +68,7 @@ public class ClassifierTests
     [Theory]
     [InlineData(Priority.Low, "Salary not received", "It is the 5th and my salary is not received.", Priority.High)]
     [InlineData(Priority.Medium, "Login", "I can’t login to anything, urgent please", Priority.High)] // curly apostrophe
+    [InlineData(Priority.Low, "Salary not credited", "My salary is not credited this month.", Priority.High)]
     [InlineData(Priority.Low, "Leave", "Planning leave in December.", Priority.Low)]
     [InlineData(Priority.High, "Leave", "Planning leave in December.", Priority.High)] // never lowered
     public void Priority_is_raised_by_boosters_but_never_lowered(Priority requested, string subject, string description, Priority expected)

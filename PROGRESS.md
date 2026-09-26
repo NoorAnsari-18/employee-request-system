@@ -2,7 +2,7 @@
 
 Update this file as each item is done. A new session resumes from the first unchecked item.
 
-**Current status:** M1–M2 done; M3 UI built and verified locally (submit, track, board read live from HubSpot). Next: deploy to Render, cron-job.org ping, seed demo data, clean up [TEST] tickets.
+**Current status:** Deployed to Render. rules.json extended (IT: cpu/computer/slow…, Payroll: form-16/tds/credited…, boosters: salary not credited, payslip missing); 26 tests pass. Next: fix Render Security__ApiKey, push rules update, clean up test tickets, seed, cron-job.org, then M4.
 
 ## M1 — Setup (cap 2h)
 - [x] Create HubSpot free account
@@ -32,7 +32,8 @@ Update this file as each item is done. A new session resumes from the first unch
 - [x] 3-column board with Start / Resolve (note), 30s auto-refresh
 - [x] Track page (/track?id=…)
 - [x] Dockerfile + .dockerignore + README (Release publish verified locally; Docker not installed locally)
-- [ ] Deploy to Render, env vars HubSpot__Token + Security__ApiKey
+- [x] Deploy to Render: https://employee-request-system.onrender.com (health, pages, HubSpot read OK)
+- [ ] Fix Render Security__ApiKey (live escalation returned 401 with local key on 2026-09-26)
 - [ ] cron-job.org ping /health
 - [ ] Seed ~8 demo tickets (scripts/seed.ps1 ready; run against Render URL, then remove [TEST] tickets)
 
@@ -59,5 +60,5 @@ Update this file as each item is done. A new session resumes from the first unch
 - Pipeline ID: 2590378726 (Employee Requests)
 - Stage IDs: Open=4357009139 Active=4357009140 Finalized=4357009141
 - Owner ID: 99794997
-- Render URL:
+- Render URL: https://employee-request-system.onrender.com
 - GitHub repo: https://github.com/NoorAnsari-18/employee-request-system (remote added)

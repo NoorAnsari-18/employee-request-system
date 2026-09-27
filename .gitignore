@@ -492,3 +492,10 @@ docs/assignment.md
 
 # Local copy of the Zapier API key for pasting into Render/Zapier
 api-key.local.txt
+
+# Internal working notes - kept locally, not published
+PROGRESS.md
+CLAUDE.md
+docs/PLAN.md
+docs/INTERVIEW-NOTES.md
+.claude/

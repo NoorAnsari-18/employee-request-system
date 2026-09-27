@@ -22,9 +22,8 @@ Employee ─► Web app (ASP.NET Core .NET 10 + React)          ◄── Zapier
 
 ## Documentation
 
-- [Zapier automations](docs/ZAPIER.md): the three Zaps step by step, why each is built that way, interview Q&A, maintenance
+- [Zapier automations](docs/ZAPIER.md): the three Zaps step by step, why each is built that way, maintenance
 - [Workflow diagram](docs/workflow.drawio): overview plus four detail pages (open at app.diagrams.net)
-- [Plan & decisions](docs/PLAN.md): every design decision and the reasoning behind it
 
 ## How a request flows
 

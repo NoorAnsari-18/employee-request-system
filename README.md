@@ -20,6 +20,12 @@ Employee ─► Web app (ASP.NET Core .NET 10 + React)          ◄── Zapier
 - **No local database:** every screen reads HubSpot live, so changes made in HubSpot's own UI show up here too.
 - **Channel-agnostic intake:** `POST /api/requests` is the single entry point. The portal form is one adapter; email (via Zapier) is another. New channels are adapters, not rewrites.
 
+## Documentation
+
+- [Zapier automations](docs/ZAPIER.md): the three Zaps step by step, why each is built that way, interview Q&A, maintenance
+- [Workflow diagram](docs/workflow.drawio): overview plus four detail pages (open at app.diagrams.net)
+- [Plan & decisions](docs/PLAN.md): every design decision and the reasoning behind it
+
 ## How a request flows
 
 1. `POST /api/requests` validates input, then the **keyword classifier** scores each department (`rules.json`). Rules decide when confidence ≥ 0.6 and score ≥ 2; otherwise the ticket goes to **Other / needs triage**.

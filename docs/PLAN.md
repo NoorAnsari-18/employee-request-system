@@ -77,6 +77,17 @@ Connections: (1) web app → HubSpot write, (2) web app ← HubSpot read (pull),
 | C4 | Board | Team filter (All/HR/IT/Payroll/Ops/Triage), deep link `/board?team=<dept>` |
 | C5 | Escalations | To manager (`Routing:ManagerEmail`), CC responsible teams (`ccEmails` in `/api/escalations/run` response) |
 
+### Classifier tuning vs HubSpot workflows (decided 2026-09-27)
+
+| # | Topic | Decision |
+|---|---|---|
+| W1 | Code vs HubSpot workflows | Keep classification/routing in code and tune rules; HubSpot workflows (Service Hub Pro trial) evaluated: plain "contains" branches, no scoring/tests, routing moves into UI, Z1 race condition, workflows switch off after trial, ~4–6h. Document as production/no-code option in summary roadmap |
+| W2 | Threshold | minScore 1 + minConfidence 0.6 (one clear signal is enough; ties → Triage Desk) |
+| W3 | "office" | Kept (Operations); strong HR phrases added: not feeling well, unwell, fever, sick leave (2), medical (1) |
+| W4 | Typos | Small misspelling list in rules.json (acess, pasword, loggin, salery, paslip, reimbursment) |
+
+Root causes found in real tickets: minScore 2 rejected single clear keywords (internet, access); missing keywords (website, not feeling well); "office" tie with "leave".
+
 ## HubSpot ticket properties
 
 Standard: `subject`, `content`, `hs_pipeline`, `hs_pipeline_stage`, `hs_ticket_priority`, `hubspot_owner_id`.

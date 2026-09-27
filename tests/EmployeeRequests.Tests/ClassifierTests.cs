@@ -48,12 +48,26 @@ public class ClassifierTests
     }
 
     [Fact]
-    public void A_single_weak_keyword_is_not_enough()
+    public void A_single_clear_keyword_is_enough()
     {
-        // "office" scores 1 point: 100% confident but below the minimum score of 2.
-        var result = Sut.Classify("Office", "Where is the office?");
+        // One unambiguous signal routes the request; only conflicting signals go to triage.
+        var result = Sut.Classify("Internet is not Working at my Cubicle", "Hey internet is not working at my cubicle, can someone check?");
 
-        Assert.Equal("fallback", result.ClassifiedBy);
+        Assert.Equal(Departments.It, result.Department);
+        Assert.Equal("rules", result.ClassifiedBy);
+    }
+
+    // Real submissions that were misrouted to Triage before the rules were tuned.
+    [Theory]
+    [InlineData("I need access to Certain WebSite on my Machine", "Please give me acess to certain website on my machine", Departments.It)]
+    [InlineData("Leave as not Feeling Well", "I would not be able to join in the office today as I am not feeling well today", Departments.Hr)]
+    [InlineData("Salery not received", "My salery for this month has not come", Departments.Payroll)]
+    public void Real_world_phrasing_and_common_typos_are_classified(string subject, string description, string expected)
+    {
+        var result = Sut.Classify(subject, description);
+
+        Assert.Equal(expected, result.Department);
+        Assert.Equal("rules", result.ClassifiedBy);
     }
 
     [Fact]

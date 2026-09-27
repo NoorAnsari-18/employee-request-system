@@ -1,13 +1,13 @@
 {
   "Routing": {
     "DefaultOwnerId": "99794997",
-    "ManagerEmail": "er-demo-manager@mailinator.com",
+    "ManagerEmail": "physiquedemo+manager@gmail.com",
     "Teams": {
-      "hr":         { "Name": "HR Team",         "Email": "er-hr-team@mailinator.com",      "OwnerId": "99794997" },
-      "it":         { "Name": "IT Support",      "Email": "er-it-team@mailinator.com",      "OwnerId": "99794997" },
-      "payroll":    { "Name": "Payroll Team",    "Email": "er-payroll-team@mailinator.com", "OwnerId": "99794997" },
-      "operations": { "Name": "Operations Team", "Email": "er-ops-team@mailinator.com",     "OwnerId": "99794997" },
-      "other":      { "Name": "Triage Desk",     "Email": "er-triage@mailinator.com",       "OwnerId": "99794997" }
+      "hr":         { "Name": "HR Team",         "Email": "physiquedemo+hr-team@gmail.com",      "OwnerId": "99794997" },
+      "it":         { "Name": "IT Support",      "Email": "physiquedemo+it-team@gmail.com",      "OwnerId": "99794997" },
+      "payroll":    { "Name": "Payroll Team",    "Email": "physiquedemo+payroll-team@gmail.com", "OwnerId": "99794997" },
+      "operations": { "Name": "Operations Team", "Email": "physiquedemo+ops-team@gmail.com",     "OwnerId": "99794997" },
+      "other":      { "Name": "Triage Desk",     "Email": "physiquedemo+triage@gmail.com",       "OwnerId": "99794997" }
     }
   }
 }

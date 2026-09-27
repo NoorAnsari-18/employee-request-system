@@ -15,7 +15,7 @@ export default function BoardPage() {
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
   const [teams, setTeams] = useState<Team[]>([])
   // ?team=payroll lets each team's notification email open straight into its own queue.
-  const [team, setTeam] = useState(() => new URLSearchParams(window.location.search).get('team') ?? 'all')
+  const [team, setTeam] = useState(() => new URLSearchParams(window.location.search).get('team') || 'all')
 
   useEffect(() => {
     api.teams().then(setTeams).catch(() => setTeams([]))

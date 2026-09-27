@@ -46,9 +46,9 @@ Update this file as each item is done. A new session resumes from the first unch
 
 ## M4 — Zapier (cap 2h)
 - [ ] Start Zapier Pro trial; connect HubSpot. Email: "Email by Zapier" for now (B7 revised 2026-09-26, personal inbox kept out); demo Gmail optional later. Demo recipients: er-demo-owner@mailinator.com, er-demo-manager@mailinator.com; demo employees use @mailinator.com
-- [ ] Z1 new ticket notifications
-- [ ] Z2 stage-change notification (or webhook fallback)
-- [ ] Z3 scheduled escalation
+- [x] Z1 new ticket notifications: trigger fields cleaned (9 custom props), filter pipeline, step 3 To = Assigned team email (tested), step 4 To = Employee email. User to delete empty step 5, rename, publish
+- [x] Z2 stage-change notification: HubSpot "New Ticket Property Change" (hs_pipeline_stage) → Filter (pipeline, stage ≠ Open) → Formatter lookup (4357009140 "now being worked on", 4357009141 "resolved") → Email to employee. Tested with Finalized sample. NOT YET PUBLISHED
+- [x] Z3 scheduled escalation: Schedule every hour → Webhooks POST /api/escalations/run (X-Api-Key pasted by user) → Filter count > 0 → Email To managerEmail, Cc ccEmails, body = summary. Tested (2 escalated). NOT YET PUBLISHED
 - [ ] Z4 email intake: Gmail `+requests` → POST /api/requests (first cut if over cap)
 - [ ] Fallback (only if Zapier blocks > 2h): C# SMTP emails + cron-job.org escalation
 
@@ -58,6 +58,11 @@ Update this file as each item is done. A new session resumes from the first unch
 ## M6 — Summary (cap 2h)
 - [ ] Candidate writes draft (own words)
 - [ ] Review, export PDF
+
+## ⚠ Before submission (reminders)
+- [ ] Create demo Gmail and swap all "Email by Zapier" steps to Gmail (Email by Zapier trial limit: 5 emails/day; test sends go to the Zapier login address)
+- [ ] Push BoardPage fix (empty ?team= → All teams) if not yet pushed
+- [ ] Optional: Z1 step 3 body link — append Department field after `/board?team=`
 
 ## Submission
 - [ ] Diagram link, prototype URL, repo URL, summary PDF sent

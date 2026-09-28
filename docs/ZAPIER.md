@@ -179,4 +179,4 @@ The web app does the work. It:
 | Reconnect Gmail or HubSpot | Zapier → **App connections** → the account → *Reconnect* (the account owner signs in). |
 | Test without waiting | Z1/Z2: submit or move a ticket on the live site; the Zap runs within about 2 minutes. Z3: open the Zap → step 2 → *Test step* (this really escalates overdue tickets). |
 | Temporarily stop emails | Turn the Zap's toggle off in the Zap list. Tickets keep flowing; nothing is lost. |
-| After the trial ends (2026-10-08) | Either upgrade the Zapier plan, or use the documented fallback: send emails from the web app (SMTP) and trigger `/api/escalations/run` from cron-job.org. |
+
